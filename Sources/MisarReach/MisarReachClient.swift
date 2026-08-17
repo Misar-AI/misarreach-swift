@@ -283,6 +283,7 @@ public final class MisarReachClient {
     public var pipeline:      PipelineResource { PipelineResource(client: self) }
     public var salesAgent:    SalesAgentResource { SalesAgentResource(client: self) }
     public var settings:      SettingsResource { SettingsResource(client: self) }
+    public var plan:      PlanResource { PlanResource(client: self) }
     public var workspaces:    WorkspacesResource { WorkspacesResource(client: self) }
     public var campaignTemplates: CampaignTemplatesResource { CampaignTemplatesResource(client: self) }
     public var deliverability:    DeliverabilityResource { DeliverabilityResource(client: self) }
@@ -1010,5 +1011,25 @@ final class ReachSSEState: @unchecked Sendable {
         let obj = raw.data(using: .utf8)
             .flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any] ?? [:]
         return MisarReachStreamEvent(event: eventName, data: obj, raw: raw)
+    }
+}
+
+// MARK: - PlanResource
+
+/// The subscription behind the API key.
+///
+/// Read this before an expensive run rather than discovering the ceiling through
+/// `MisarReachError.upgradeRequired` halfway through: a 402 says a call *was*
+/// refused, whereas `usage` says what is left before anything is spent.
+public final class PlanResource {
+    private let client: MisarReachClient
+    init(client: MisarReachClient) { self.client = client }
+
+    /// `GET /plan` — plan, caps, per-feature usage and the upgrade offer.
+    ///
+    /// A null limit means unlimited, and `remaining` is null with it rather than
+    /// 0 — 0 would read as exhausted.
+    public func get() async throws -> [String: Any] {
+        try await client.request(method: "GET", path: "/plan")
     }
 }
