@@ -23,7 +23,7 @@ import MisarReach
 let client = MisarReachClient(apiKey: "mrk_...")
 
 // Start an async lead search
-let job = try await client.leads.search(["query": "saas founders", "limit": 25])
+let job = try await client.leads.search(["query": "saas founders", "useAI": true])
 
 // Poll the job
 let status = try await client.leads.jobStatus(jobId: job["jobId"] as! String)
@@ -56,6 +56,10 @@ try await client.leads.streamJob(jobId: jobId) { event in
 
 > SwiftPM requires `Package.swift` at the repository root, so this SDK is
 > mirrored to its own repository. The monorepo URL will not resolve.
+
+> The standalone repository carries **no version tag yet**, so a `from:`
+> requirement cannot resolve until the first release publishes one. Until
+> then, depend on `branch: "main"`.
 
 ## Resources
 
